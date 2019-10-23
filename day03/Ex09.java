@@ -36,7 +36,6 @@ class Ex09{
 		grade-=1;
       	case 6:
 		grade-=2;
-      	default :
       }
 
       String title="己利包府橇肺弊伐(ver.0.0.1)";
