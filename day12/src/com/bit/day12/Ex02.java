@@ -23,27 +23,27 @@ public class Ex02 {
 		System.out.println(su3+"+"+su4+"="+plus(su3,su4));
 		System.out.println(su1+"-"+su2+"="+minus(su1,su2));
 		System.out.println(su1+"x"+su2+"="+multi(su1,su2));
-		System.out.println(su1+"¡À"+su2+"="+div(su1,su2));
-		System.out.println(5+"¡À"+2+"="+div(5,2));
-		System.out.println(6+"¡À"+2+"="+div(6,2));
-		System.out.println(2.5+"¡À"+1.5+"="+div(2.5,1.5));
+//		System.out.println(su1+"¡À"+su2+"="+div(su1,su2));
+//		System.out.println(5+"¡À"+2+"="+div(5,2));
+//		System.out.println(6+"¡À"+2+"="+div(6,2));
+//		System.out.println(2.5+"¡À"+1.5+"="+div(2.5,1.5));
 	}
 	
-	public static Number div(int a, int b){
-		if(a%b==0){
-			return a/b;
-		}else {
-			return a*1.0/b;
-		}
-	}
-	
-	public static Number div(double a, double b){
-		if(a%b==0){
-			return a/b;
-		}else {
-			return a*1.0/b;
-		}
-	}
+//	public static Number div(int a, int b){
+//		if(a%b==0){
+//			return a/b;
+//		}else {
+//			return a*1.0/b;
+//		}
+//	}
+//	
+//	public static Number div(double a, double b){
+//		if(a%b==0){
+//			return a/b;
+//		}else {
+//			return a*1.0/b;
+//		}
+//	}
 	
 	////////////////////////////////////
 	
