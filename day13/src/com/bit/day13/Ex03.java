@@ -73,13 +73,18 @@ public class Ex03 {
 			else if(input.equals("4")){
 				System.out.print("삭제할 학생학번>");
 				input=sc.nextLine();
-				int del=Integer.parseInt(input);
-//				int idx=-1;
-//				for(int i=0; i<data.length; i++){
-//					if(del==data[i][0]){idx=i;}
-//				}
-//				data[idx]=new int[4];
-				data[del-1]=new int[4];
+				int idx=Integer.parseInt(input)-1;
+				int[][] students=data;
+				data=new int[data.length-1][];
+				// before
+				for(int i=0; i<idx; i++){
+					data[i]=students[i];
+				}
+				// after
+				for(int i=idx; i<data.length; i++){
+					data[i]=students[i+1];
+				}
+				
 				
 			}
 			else{}
