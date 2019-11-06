@@ -77,9 +77,16 @@ public class Ex01 {
 	}
 	
 	public static int inputScan(String msg,Scanner sc){
-		System.out.print(msg);
-		String input=sc.nextLine();
-		int num=Integer.parseInt(input);
+		return inputScan(0,100,msg,sc);
+	}
+	public static int inputScan(int start,int end,String msg,Scanner sc){
+		int num=-1;
+		while(true){
+			System.out.print(msg);
+			String input=sc.nextLine();
+			num=Integer.parseInt(input);
+			if(num>=start&&num<=end){break;}
+		}
 		return num;
 	}
 }

@@ -9,6 +9,10 @@ public class Ex02 {
 		//\n1\t|11\t|22\t|33
 		//\n2\t|22\t|24\t|35
 		//\n3\t|72\t|84\t|95
+		//////////////////////////////
+		//1\t|11\t|22\t|33
+		//2\t|22\t|24\t|35
+		//3\t|72\t|84\t|95
 		Scanner sc=new Scanner(System.in);
 		String bar="----------------------------------------";
 		String table=bar+"\n학번\t|국어\t|영어\t|수학\n"+bar;
@@ -41,12 +45,68 @@ public class Ex02 {
 				System.out.println(data);
 			}
 			else if(input.equals("3")){
-				System.out.println("수정");
+				String[] rows=data.split("\n");
+				System.out.print("수정할 학번>");
+				input=sc.nextLine();
+				int delIdx=Integer.parseInt(input);
+				data="";
+				for(int i=0; i<rows.length; i++){
+					if(delIdx==i){
+						System.out.print("국어>");
+						input=sc.nextLine();
+						int kor=Integer.parseInt(input);
+						System.out.print("영어>");
+						input=sc.nextLine();
+						int eng=Integer.parseInt(input);
+						System.out.print("수학>");
+						input=sc.nextLine();
+						int math=Integer.parseInt(input);
+						data+="\n"+delIdx+"\t|"+kor
+									+"\t|"+eng+"\t|"+math;;
+					}else{
+						data+="\n"+rows[i];
+					}
+				}
+				data=data.replace("\n\n", "\n");
 			}
 			else if(input.equals("4")){
+				
+				String[] rows=data.split("\n");
+				System.out.print("삭제할 학번>");
+				input=sc.nextLine();
+//				int delIdx=Integer.parseInt(input);
+				int idx=-1;
+				for(int i=0; i<rows.length; i++){
+					if(rows[i].startsWith(input+"\t|")){
+						System.out.println(i);
+						idx=i;
+					}
+				}
+				data="";
+				for(int i=1; i<rows.length; i++){
+					if(idx==i){continue;}
+					data+="\n"+rows[i];
+				}
 			}
 		}
 		System.out.println("이용해주셔서 감사합니다");
 	}
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
