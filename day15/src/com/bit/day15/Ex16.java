@@ -63,13 +63,15 @@ public class Ex16 {
 					temp= data.get(i);
 					if(su==temp.get("num")){
 						Map<String,Integer> stu=new HashMap<>();
-						stu.put("num", ++num);
+						stu.put("num", su);
 						for(int j=0; j<lec.length; j++){
 							System.out.print(lec[j]+">");
 							input=sc.nextLine();
 							stu.put(lec[j], Integer.parseInt(input));
+							
 						}
-						data.add(i,stu);
+						data.set(i,stu);
+						break;
 					}
 				}
 			}
