@@ -15,6 +15,7 @@ import javax.swing.JTextField;
 import javax.swing.UIManager;
 
 import oracle.jdbc.OracleDriver;
+import oracle.jdbc.OracleTypes;
 
 import java.awt.Color;
 import java.sql.CallableStatement;
@@ -28,6 +29,7 @@ import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.Button;
+import java.awt.List;
 
 public class Ex01 extends Frame{
 	private JTextField tfKor;
@@ -36,12 +38,14 @@ public class Ex01 extends Frame{
 	private JTextField textField;
 	private JTextField textField_1;
 	private JTextField textField_2;
+	List list=new List();
+	final String url="jdbc:oracle:thin:@127.0.0.1:1521:xe";
+	final java.util.Properties info=new Properties();
+	JButton hiddenBtn=new JButton();
 
 	public Ex01() {
 		oracle.jdbc.driver.OracleDriver driver=null;
 		driver=new OracleDriver();
-		final String url="jdbc:oracle:thin:@127.0.0.1:1521:xe";
-		final java.util.Properties info=new Properties();
 		info.setProperty("user", "scott");
 		info.setProperty("password", "tiger");
 		
@@ -62,14 +66,16 @@ public class Ex01 extends Frame{
 		
 		JPanel panel_1 = new JPanel();
 		panel.add(panel_1, BorderLayout.SOUTH);
+		panel_1.add(hiddenBtn);
+		hiddenBtn.setVisible(false);
 		
 		final JPanel list_view= new JPanel();
 		panel.add(list_view, BorderLayout.CENTER);
 		
 		
-		JButton btnNewButton = new JButton("\uC785\uB825");
-		JButton btnNewButton_1 = new JButton("\uC218\uC815");
-		JButton btnNewButton_2 = new JButton("\uC0AD\uC81C");
+		final JButton btnNewButton = new JButton("\uC785\uB825");
+		final JButton btnNewButton_1 = new JButton("\uC218\uC815");
+		final JButton btnNewButton_2 = new JButton("\uC0AD\uC81C");
 		JButton btnNewButton_3 = new JButton("\uC885\uB8CC");
 		
 		panel_1.add(btnNewButton);
@@ -199,7 +205,7 @@ public class Ex01 extends Frame{
 		gbc_lblNewLabel_6.gridy = 1;
 		edit_view.add(lblNewLabel_6, gbc_lblNewLabel_6);
 		
-		Choice choice_1 = new Choice();
+		final Choice choice_1 = new Choice();
 		GridBagConstraints gbc_choice_1 = new GridBagConstraints();
 		gbc_choice_1.insets = new Insets(0, 0, 5, 5);
 		gbc_choice_1.gridx = 0;
@@ -242,12 +248,24 @@ public class Ex01 extends Frame{
 		gbc_panel_2.gridy = 3;
 		edit_view.add(panel_2, gbc_panel_2);
 		
-		Button button_1 = new Button("\uC218\uC815");
-		panel_2.add(button_1);
+		Button btn_edit = new Button("\uC218\uC815");
+		panel_2.add(btn_edit);
 		
 		Button button_2 = new Button("\uCDE8\uC18C");
 		panel_2.add(button_2);
-		
+
+		hiddenBtn.addActionListener(new ActionListener() {
+			
+			public void actionPerformed(ActionEvent e) {
+				panel.remove(add_view);
+				panel.remove(edit_view);
+				panel.remove(del_view);
+				panel.add(list_view, BorderLayout.CENTER);
+				panel.revalidate();
+				panel.repaint();
+				showList();
+			}
+		});
 		
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -270,6 +288,32 @@ public class Ex01 extends Frame{
 				panel.add(edit_view, BorderLayout.CENTER);
 				panel.revalidate();
 				panel.repaint();
+				
+				choice_1.removeAll();
+				String sql="{call stu01_num(?)}";
+				Connection conn=null;
+				CallableStatement cstmt=null;
+				ResultSet rs=null;
+				try {
+					conn=DriverManager.getConnection(url, info);
+					cstmt=conn.prepareCall(sql);
+					cstmt.registerOutParameter(1, oracle.jdbc.OracleTypes.CURSOR);
+					cstmt.execute();
+					rs=(ResultSet) cstmt.getObject(1);
+					while(rs.next()){
+						choice_1.add(rs.getObject(1).toString());
+					}
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				} finally{
+					try {
+						if(rs!=null)rs.close();
+						if(cstmt!=null)cstmt.close();
+						if(conn!=null)conn.close();
+					} catch (SQLException e1) {
+						e1.printStackTrace();
+					}
+				}
 			}
 		});
 		
@@ -282,7 +326,8 @@ public class Ex01 extends Frame{
 				panel.add(del_view, BorderLayout.CENTER);
 				panel.revalidate();
 				panel.repaint();
-				
+
+				choice.removeAll();
 				// select num from stu01 order by num;
 				String sql="{call stu01_num(?)}";
 				Connection conn=null;
@@ -311,11 +356,130 @@ public class Ex01 extends Frame{
 			}
 		});
 		
+		btn_edit.addActionListener(new ActionListener() {
+			
+			public void actionPerformed(ActionEvent e) {
+				int num=Integer.parseInt(choice_1.getSelectedItem());
+				int kor=Integer.parseInt(textField.getText());
+				int eng=Integer.parseInt(textField_1.getText());
+				int math=Integer.parseInt(textField_2.getText());
+				
+//				sql="update stu01 set kor=v_kor,eng=v_eng,math=v_math where num=v_num";
+				String sql="{call stu01_edit("+num
+							+","+kor+","+eng+","+math+")}";
+				Connection conn=null;
+				CallableStatement cstmt=null;
+				try {
+					conn=DriverManager.getConnection(url,info);
+					cstmt=conn.prepareCall(sql);
+					cstmt.execute();
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				} finally{
+					try {
+						if(cstmt!=null)cstmt.close();
+						if(conn!=null)conn.close();
+					} catch (SQLException e1) {
+						e1.printStackTrace();
+					}
+				}
+				hiddenBtn.doClick();
+				textField.setText(null);
+				textField_1.setText(null);
+				textField_2.setText(null);
+			}
+		});
+		
+		button.addActionListener(new ActionListener() {
+			
+			public void actionPerformed(ActionEvent e) {
+				int num =Integer.parseInt(choice.getSelectedItem());
+				//delete from stu01 where num=v_num;
+				String sql="{call stu01_del("+num+")}";
+				Connection conn=null;
+				CallableStatement cstmt=null;
+				
+				try {
+					conn=DriverManager.getConnection(url, info);
+					cstmt=conn.prepareCall(sql);
+					cstmt.execute();
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				} finally{
+					try {
+						if(cstmt!=null)cstmt.close();
+						if(conn!=null)conn.close();
+					} catch (SQLException e1) {
+						e1.printStackTrace();
+					}
+				}
+				hiddenBtn.doClick();
+			}
+		});
+		
+		showList();
+		list_view.add(list);
+		
 		setBounds(100-1024,100,500,400);
 		setVisible(true);
+	}
+	
+	public void showList(){
+//		String sql="select * from stu01 order by num";
+//		list.add();
+//		test
+//		SQL> declare
+//		  2  v_cursor sys_refcursor;
+//		  3  msg varchar2(100);
+//		  4  begin
+//		  5     stu01_list(v_cursor);
+//		  6  loop
+//		  7  fetch v_cursor into msg;
+//		  8  exit when v_cursor%notfound;
+//		  9  dbms_output.put_line(msg);
+//		 10  end loop;
+//		 11  end;
+//		 12  /
+		list.removeAll();
+		String sql="{call stu01_list(?)}";
+		Connection conn=null;
+		CallableStatement cstmt=null;
+		ResultSet rs=null;
+		try {
+			conn=DriverManager.getConnection(url,info);
+			cstmt=conn.prepareCall(sql);
+			cstmt.registerOutParameter(1, OracleTypes.CURSOR);
+			cstmt.execute();
+			rs=(ResultSet) cstmt.getObject(1);
+			while(rs.next()){
+				list.add(rs.getObject(1).toString());
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally{
+			try {
+				if(rs!=null)rs.close();
+				if(cstmt!=null)cstmt.close();
+				if(conn!=null)conn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	public static void main(String[] args) {
 		new Ex01();
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
