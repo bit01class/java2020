@@ -17,7 +17,10 @@ import javax.swing.UIManager;
 import oracle.jdbc.OracleDriver;
 
 import java.awt.Color;
+import java.sql.CallableStatement;
+import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Properties;
 import java.awt.Choice;
@@ -35,6 +38,14 @@ public class Ex01 extends Frame{
 	private JTextField textField_2;
 
 	public Ex01() {
+		oracle.jdbc.driver.OracleDriver driver=null;
+		driver=new OracleDriver();
+		final String url="jdbc:oracle:thin:@127.0.0.1:1521:xe";
+		final java.util.Properties info=new Properties();
+		info.setProperty("user", "scott");
+		info.setProperty("password", "tiger");
+		
+		
 		addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
 				dispose();
@@ -51,6 +62,10 @@ public class Ex01 extends Frame{
 		
 		JPanel panel_1 = new JPanel();
 		panel.add(panel_1, BorderLayout.SOUTH);
+		
+		final JPanel list_view= new JPanel();
+		panel.add(list_view, BorderLayout.CENTER);
+		
 		
 		JButton btnNewButton = new JButton("\uC785\uB825");
 		JButton btnNewButton_1 = new JButton("\uC218\uC815");
@@ -70,7 +85,7 @@ public class Ex01 extends Frame{
 		
 		final JPanel del_view = new JPanel();
 		
-		Choice choice = new Choice();
+		final Choice choice = new Choice();
 		del_view.add(choice);
 		
 		JButton button = new JButton("\uC0AD\uC81C");
@@ -79,8 +94,6 @@ public class Ex01 extends Frame{
 		final JPanel add_view = new JPanel();
 		add_view.setBackground(new Color(0, 128, 128));
 		add_view.setForeground(new Color(0, 128, 128));
-		
-		panel.add(add_view, BorderLayout.CENTER);
 		
 		add_view.setLayout(null);
 		
@@ -118,14 +131,6 @@ public class Ex01 extends Frame{
 				int kor =Integer.parseInt(tfKor.getText());
 				int eng =Integer.parseInt(tfEng.getText());
 				int math =Integer.parseInt(tfMath.getText());
-				
-				oracle.jdbc.driver.OracleDriver driver=null;
-				driver=new OracleDriver();
-				String url="jdbc:oracle:thin:@127.0.0.1:1521:xe";
-				java.util.Properties info=null;
-				info=new Properties();
-				info.setProperty("user", "scott");
-				info.setProperty("password", "tiger");
 				
 				String sql="{call stu01_add("+kor+","+eng+","+math+")}";
 				java.sql.Connection conn=null;
@@ -247,6 +252,7 @@ public class Ex01 extends Frame{
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				// 입력
+				panel.remove(list_view);
 				panel.remove(edit_view);
 				panel.remove(del_view);
 				panel.add(add_view, BorderLayout.CENTER);
@@ -258,6 +264,7 @@ public class Ex01 extends Frame{
 		btnNewButton_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				// 수정
+				panel.remove(list_view);
 				panel.remove(add_view);
 				panel.remove(del_view);
 				panel.add(edit_view, BorderLayout.CENTER);
@@ -269,11 +276,38 @@ public class Ex01 extends Frame{
 		btnNewButton_2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				// 삭제
+				panel.remove(list_view);
 				panel.remove(add_view);
 				panel.remove(edit_view);
 				panel.add(del_view, BorderLayout.CENTER);
 				panel.revalidate();
 				panel.repaint();
+				
+				// select num from stu01 order by num;
+				String sql="{call stu01_num(?)}";
+				Connection conn=null;
+				CallableStatement cstmt=null;
+				ResultSet rs=null;
+				try {
+					conn=DriverManager.getConnection(url, info);
+					cstmt=conn.prepareCall(sql);
+					cstmt.registerOutParameter(1, oracle.jdbc.OracleTypes.CURSOR);
+					cstmt.execute();
+					rs=(ResultSet) cstmt.getObject(1);
+					while(rs.next()){
+						choice.add(rs.getObject(1).toString());
+					}
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				} finally{
+					try {
+						if(rs!=null)rs.close();
+						if(cstmt!=null)cstmt.close();
+						if(conn!=null)conn.close();
+					} catch (SQLException e1) {
+						e1.printStackTrace();
+					}
+				}
 			}
 		});
 		
